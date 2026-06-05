@@ -1,0 +1,19 @@
+{
+    "name": "InputPrompts.Editor",
+    "rootNamespace": "InputPrompts.Editor",
+    "references": [
+        "GUID:d372064bddbb5ea42b668a7c3b16f767",
+        "GUID:75469ad4d38634e559750d17036d5f7c"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
