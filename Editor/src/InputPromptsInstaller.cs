@@ -10,9 +10,10 @@ namespace InputPrompts.Editor
     /// One-click installer for the Input Prompts feature.
     ///
     /// On Install it:
-    ///  1) creates the ScriptableObjects (channel, 3 icon sets, resolver, action list),
-    ///  2) pre-fills the icon sets from a sprite folder and generates the action list
-    ///     from an .inputactions asset (via the shared helpers),
+    ///  1) creates (or reuses) the ScriptableObjects (channel, 3 icon sets, resolver,
+    ///     action list) - safe to re-run, it does not duplicate existing assets,
+    ///  2) pre-fills the icon sets from a sprite folder and generates a curated action
+    ///     list from an .inputactions asset (via the shared helpers),
     ///  3) wires the icon sets into the resolver,
     ///  4) instantiates the legend prefab and a tracker GameObject into the open scene,
     ///     and wires every SO reference.
@@ -29,7 +30,7 @@ namespace InputPrompts.Editor
         public static void ShowWindow()
         {
             InputPromptsInstaller window = GetWindow<InputPromptsInstaller>("Input Prompts Installer");
-            window.minSize = new Vector2(440, 380);
+            window.minSize = new Vector2(440, 400);
         }
 
         private void OnGUI()
@@ -48,6 +49,7 @@ namespace InputPrompts.Editor
             GUILayout.Label("Options", EditorStyles.boldLabel);
             _skipUiMap = EditorGUILayout.Toggle("Skip 'UI' map", _skipUiMap);
             _buttonsOnly = EditorGUILayout.Toggle("Buttons only", _buttonsOnly);
+            _curate = EditorGUILayout.Toggle("Curate (skip Move/Look/...)", _curate);
             _addToScene = EditorGUILayout.Toggle("Add to open scene", _addToScene);
 
             EditorGUILayout.Space(10);
@@ -82,16 +84,18 @@ namespace InputPrompts.Editor
 
         private void Install()
         {
+            CheckTmpResources();
+
             string folder = EnsureFolder(_outputFolder);
             string spriteFolderPath = AssetDatabase.GetAssetPath(_spriteFolder);
 
-            // 1) ScriptableObjects.
-            var channel = CreateAsset<InputDeviceChangedChannel>(folder, "InputDeviceChangedChannel");
-            InputIconSet keyboard = CreateIconSet(folder, "IconSet_Keyboard", DeviceFamily.KeyboardMouse);
-            InputIconSet xbox = CreateIconSet(folder, "IconSet_Xbox", DeviceFamily.Xbox);
-            InputIconSet playstation = CreateIconSet(folder, "IconSet_PlayStation", DeviceFamily.PlayStation);
-            var resolver = CreateAsset<InputIconResolver>(folder, "InputIconResolver");
-            var actionList = CreateAsset<PromptActionList>(folder, "PromptActionList");
+            // 1) ScriptableObjects (reused if already present in the output folder).
+            var channel = GetOrCreate<InputDeviceChangedChannel>(folder, "InputDeviceChangedChannel");
+            InputIconSet keyboard = GetOrCreateIconSet(folder, "IconSet_Keyboard", DeviceFamily.KeyboardMouse);
+            InputIconSet xbox = GetOrCreateIconSet(folder, "IconSet_Xbox", DeviceFamily.Xbox);
+            InputIconSet playstation = GetOrCreateIconSet(folder, "IconSet_PlayStation", DeviceFamily.PlayStation);
+            var resolver = GetOrCreate<InputIconResolver>(folder, "InputIconResolver");
+            var actionList = GetOrCreate<PromptActionList>(folder, "PromptActionList");
 
             // 2) Pre-fill data via the shared helpers.
             FillIconSet(keyboard, spriteFolderPath);
@@ -99,7 +103,8 @@ namespace InputPrompts.Editor
             FillIconSet(playstation, spriteFolderPath);
 
             int entries = PromptActionListGenerator.Generate(
-                actionList, _inputActions, _skipUiMap, _buttonsOnly);
+                actionList, _inputActions, _skipUiMap, _buttonsOnly,
+                _curate ? PromptActionListGenerator.DefaultExclusions : System.Array.Empty<string>());
             Debug.Log($"[InputPrompts] Generated {entries} legend entries.");
 
             // 3) Wire the resolver.
@@ -108,7 +113,7 @@ namespace InputPrompts.Editor
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            // 4) Scene.
+            // 4) Scene (skips if a legend or tracker is already present).
             if (_addToScene)
             {
                 AddToScene(channel, resolver, actionList);
@@ -121,6 +126,19 @@ namespace InputPrompts.Editor
         private void AddToScene(
             InputDeviceChangedChannel channel, InputIconResolver resolver, PromptActionList actionList)
         {
+            // Anti-duplicate: do not add a second legend / tracker if the scene has them.
+            InputLegendView existingView =
+                FindFirstObjectByType<InputLegendView>(FindObjectsInactive.Include);
+            InputDeviceTracker existingTracker =
+                FindFirstObjectByType<InputDeviceTracker>(FindObjectsInactive.Include);
+
+            if (existingView != null || existingTracker != null)
+            {
+                Debug.LogWarning("[InputPrompts] A legend or tracker already exists in the scene. "
+                    + "Skipped scene setup to avoid duplicates.");
+                return;
+            }
+
             var canvas = (GameObject)PrefabUtility.InstantiatePrefab(_legendPrefab);
             Undo.RegisterCreatedObjectUndo(canvas, "Add Input Prompts Legend");
 
@@ -156,9 +174,8 @@ namespace InputPrompts.Editor
             Debug.LogWarning("[InputPrompts] TODO 1/2 - Composite: add '2DVector' -> your WASD "
                 + "cluster sprite in IconSet_Keyboard > Composites. The installer cannot guess it.");
 
-            Debug.LogWarning("[InputPrompts] TODO 2/2 - Prune PromptActionList: keep only the verbs "
-                + "you want in the corner. Remove Move, Look, Next, Previous, Point, Navigate, "
-                + "ScrollWheel, TrackedDevice*, etc.");
+            Debug.LogWarning("[InputPrompts] TODO 2/2 - Review PromptActionList: keep only the verbs "
+                + "you want in the corner (curation already skipped Move/Look/... if enabled).");
 
             if (addedToScene)
             {
@@ -175,6 +192,19 @@ namespace InputPrompts.Editor
 
         #region Tools and Utilities
 
+        // TMP needs its Essential Resources imported into the host project; a package
+        // cannot ship them. Detect their absence and tell the user how to fix it.
+        private static void CheckTmpResources()
+        {
+            string[] found = AssetDatabase.FindAssets("t:TMP_Settings");
+            if (found == null || found.Length == 0)
+            {
+                Debug.LogWarning("[InputPrompts] TextMeshPro resources not found. The legend text "
+                    + "will not render. Import them via Window > TextMeshPro > Import TMP Essential "
+                    + "Resources.");
+            }
+        }
+
         private static void FillIconSet(InputIconSet set, string spriteFolderPath)
         {
             InputIconSetFiller.Report report = InputIconSetFiller.Fill(set, spriteFolderPath);
@@ -189,9 +219,9 @@ namespace InputPrompts.Editor
             }
         }
 
-        private static InputIconSet CreateIconSet(string folder, string assetName, DeviceFamily family)
+        private static InputIconSet GetOrCreateIconSet(string folder, string assetName, DeviceFamily family)
         {
-            InputIconSet set = CreateAsset<InputIconSet>(folder, assetName);
+            InputIconSet set = GetOrCreate<InputIconSet>(folder, assetName);
 
             var so = new SerializedObject(set);
             // Enum values are sequential (0..5), so the popup index maps to the value.
@@ -216,10 +246,17 @@ namespace InputPrompts.Editor
             so.ApplyModifiedProperties();
         }
 
-        private static T CreateAsset<T>(string folder, string assetName) where T : ScriptableObject
+        // Anti-duplicate: reuse the asset at the target path if it already exists.
+        private static T GetOrCreate<T>(string folder, string assetName) where T : ScriptableObject
         {
+            string path = $"{folder}/{assetName}.asset";
+            T existing = AssetDatabase.LoadAssetAtPath<T>(path);
+            if (existing != null)
+            {
+                return existing;
+            }
+
             T asset = CreateInstance<T>();
-            string path = AssetDatabase.GenerateUniqueAssetPath($"{folder}/{assetName}.asset");
             AssetDatabase.CreateAsset(asset, path);
             return asset;
         }
@@ -260,6 +297,7 @@ namespace InputPrompts.Editor
 
         private bool _skipUiMap = true;
         private bool _buttonsOnly = false;
+        private bool _curate = true;
         private bool _addToScene = true;
 
         #endregion

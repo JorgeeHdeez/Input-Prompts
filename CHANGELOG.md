@@ -5,7 +5,20 @@ All notable changes to this package are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2026-06-05
+
+## [1.1.0] - 2026-06-06
+
+### Added
+- Curated PromptActionList generation (skips Move/Look/Point/Navigate...).
+- Installer is now safe to re-run: reuses existing ScriptableObjects instead
+  of duplicating them, and skips scene setup if a legend/tracker already exists.
+- TextMeshPro Essential Resources check with a clear console hint.
+
+### Fixed
+- Device flicker caused by stick drift (actuation threshold on detection).
+
+
+## [1.1.0] - 2026-06-05
 
 ### Added
 - Last-used device detection (`InputDeviceTracker`) via `InputSystem.onActionChange`,
