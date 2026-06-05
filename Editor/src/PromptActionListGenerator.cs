@@ -106,7 +106,7 @@ namespace InputPrompts.Editor
         {
             var map = new Dictionary<string, InputActionReference>();
             string path = AssetDatabase.GetAssetPath(asset);
-            Object[] all = AssetDatabase.LoadAllAssetsAtPath(path);
+            UnityEngine.Object[] all = AssetDatabase.LoadAllAssetsAtPath(path);
 
             for (int i = 0; i < all.Length; i++)
             {
