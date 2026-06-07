@@ -5,20 +5,29 @@ All notable changes to this package are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this package adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-06-06
+
+### Added
+- Contextual world-space prompt (`InteractionPrompt`): shows an action's icon and
+  label above an object, reusing the same resolver and device channel as the legend.
+  Re-resolves live on device switch while shown.
+- `FaceCamera` billboard helper for world-space prompts in 3D (injected camera, with
+  a `Camera.main` fallback). Not needed in 2D or with a fixed camera.
+- Sample interaction triggers (`InteractionTrigger2D`, `InteractionTrigger3D`) under
+  Samples to drive a prompt from a proximity zone.
 
 ## [1.1.0] - 2026-06-06
 
 ### Added
-- Curated PromptActionList generation (skips Move/Look/Point/Navigate...).
-- Installer is now safe to re-run: reuses existing ScriptableObjects instead
-  of duplicating them, and skips scene setup if a legend/tracker already exists.
+- Curated `PromptActionList` generation (skips Move/Look/Point/Navigate/etc.).
+- Installer is now safe to re-run: reuses existing ScriptableObjects instead of
+  duplicating them, and skips scene setup if a legend/tracker already exists.
 - TextMeshPro Essential Resources check with a clear console hint.
 
 ### Fixed
 - Device flicker caused by stick drift (actuation threshold on detection).
 
-
-## [1.1.0] - 2026-06-05
+## [1.0.0] - 2026-06-05
 
 ### Added
 - Last-used device detection (`InputDeviceTracker`) via `InputSystem.onActionChange`,

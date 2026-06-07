@@ -1,12 +1,12 @@
 {
-  "name": "com.jorgeehdeez.input-prompts",
-  "version": "1.1.0",
+  "name": "com.REPLACE_ORG.input-prompts",
+  "version": "1.2.0",
   "displayName": "Input Prompts",
   "description": "Dynamic on-screen input prompt legend for the Unity New Input System. Resolves bound controls to icons and adapts to the last device used (Keyboard/Mouse, Xbox, PlayStation; generic gamepad fallback). Includes a one-click installer and auto-fill editor tools.",
   "unity": "6000.0",
-  "documentationUrl": "https://github.com/jorgeehdeez/input-prompts",
-  "changelogUrl": "https://github.com/jorgeehdeez/input-prompts/blob/main/CHANGELOG.md",
-  "licensesUrl": "https://github.com/jorgeehdeez/input-prompts/blob/main/LICENSE.md",
+  "documentationUrl": "https://github.com/REPLACE_ORG/input-prompts",
+  "changelogUrl": "https://github.com/REPLACE_ORG/input-prompts/blob/main/CHANGELOG.md",
+  "licensesUrl": "https://github.com/REPLACE_ORG/input-prompts/blob/main/LICENSE.md",
   "dependencies": {
     "com.unity.inputsystem": "1.8.0",
     "com.unity.ugui": "2.0.0"
@@ -20,8 +20,8 @@
     "icons"
   ],
   "author": {
-    "name": "JorgeHdez",
-    "url": "https://github.com/jorgeehdeez"
+    "name": "REPLACE_AUTHOR",
+    "url": "https://github.com/REPLACE_ORG"
   },
   "license": "MIT",
   "samples": [
