@@ -75,7 +75,6 @@ namespace InputPrompts.Runtime
             }
         }
 
-        // Pure helper: case- and whitespace-insensitive key.
         private static string Normalize(string raw)
         {
             return string.IsNullOrEmpty(raw) ? string.Empty : raw.Trim().ToLowerInvariant();

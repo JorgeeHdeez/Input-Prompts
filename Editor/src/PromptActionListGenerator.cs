@@ -100,8 +100,6 @@ namespace InputPrompts.Editor
 
             return false;
         }
-
-        // The .inputactions asset stores one InputActionReference sub-asset per action.
         public static Dictionary<string, InputActionReference> BuildReferenceMap(InputActionAsset asset)
         {
             var map = new Dictionary<string, InputActionReference>();

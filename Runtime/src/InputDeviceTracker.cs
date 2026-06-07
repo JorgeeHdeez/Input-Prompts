@@ -83,7 +83,6 @@ namespace InputPrompts.Runtime
 
         private void RaiseInitial()
         {
-            // Sensible desktop default: keyboard if present, otherwise gamepad.
             InputDevice initial = Keyboard.current != null
                 ? (InputDevice)Keyboard.current
                 : Gamepad.current;
@@ -94,8 +93,6 @@ namespace InputPrompts.Runtime
             }
         }
 
-        // Self-contained detection: fired whenever an enabled action performs.
-        // Cheap: Report() early-outs unless the family actually changes.
         private void HandleActionChange(object actionObject, InputActionChange change)
         {
             if (change != InputActionChange.ActionPerformed)
@@ -105,7 +102,6 @@ namespace InputPrompts.Runtime
 
             if (actionObject is InputAction action && action.activeControl != null)
             {
-                // Ignore analog noise / stick drift: only count real actuation.
                 if (action.activeControl.IsActuated(_actuationThreshold))
                 {
                     Report(action.activeControl.device);

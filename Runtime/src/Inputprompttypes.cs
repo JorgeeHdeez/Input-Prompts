@@ -69,7 +69,6 @@ namespace InputPrompts.Runtime
             return DeviceFamily.Unknown;
         }
 
-        // True for any gamepad, regardless of brand.
         public static bool IsGamepad(DeviceFamily family)
         {
             return family == DeviceFamily.GenericGamepad

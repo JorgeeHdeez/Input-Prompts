@@ -43,7 +43,6 @@ namespace InputPrompts.Runtime
             Sprite sprite = null;
             if (binding.isComposite)
             {
-                // Option A: map the composite TYPE (e.g. "2DVector") to a single glyph.
                 if (set != null) set.TryGetComposite(binding.path, out sprite);
             }
             else
@@ -61,13 +60,11 @@ namespace InputPrompts.Runtime
 
         #region Tools and Utilities
 
-        // Pick the matching icon set, falling back to the generic gamepad set.
         private InputIconSet FindSet(DeviceFamily family)
         {
             InputIconSet exact = FindByFamily(family);
             if (exact != null) return exact;
 
-            // Unknown-brand pad / missing set -> fall back to GenericGamepad.
             if (InputDeviceFamilies.IsGamepad(family)) return FindByFamily(DeviceFamily.GenericGamepad);
 
             return null;
@@ -83,7 +80,6 @@ namespace InputPrompts.Runtime
             return null;
         }
 
-        // Returns the binding index to display (composite header included), or -1.
         private static int SelectBindingIndex(InputAction action, DeviceFamily family)
         {
             bool wantGamepad = InputDeviceFamilies.IsGamepad(family);
@@ -93,7 +89,6 @@ namespace InputPrompts.Runtime
             {
                 InputBinding b = bindings[i];
 
-                // Skip parts: the composite HEADER is what we display (Option A).
                 if (b.isPartOfComposite) continue;
 
                 string path = b.isComposite ? FirstPartPath(bindings, i) : b.effectivePath;
@@ -105,7 +100,6 @@ namespace InputPrompts.Runtime
             return -1;
         }
 
-        // For a composite, read the device via its first part's path.
         private static string FirstPartPath(
             UnityEngine.InputSystem.Utilities.ReadOnlyArray<InputBinding> bindings,
             int compositeIndex)
@@ -119,9 +113,7 @@ namespace InputPrompts.Runtime
 
             return string.Empty;
         }
-
-        // Coarse family match (gamepad vs keyboard/mouse): bindings almost always
-        // use "<Gamepad>" / "<Keyboard>" / "<Mouse>", so this is enough.
+       
         private static bool BindingMatchesFamily(string effectivePath, bool wantGamepad)
         {
             string deviceLayout = InputControlPath.TryGetDeviceLayout(effectivePath);
@@ -131,7 +123,6 @@ namespace InputPrompts.Runtime
             return wantGamepad ? !isKeyboardMouse : isKeyboardMouse;
         }
 
-        // "<Gamepad>/buttonSouth" -> "buttonSouth" ;  "<Keyboard>/space" -> "space".
         private static string ExtractControlToken(string effectivePath)
         {
             if (string.IsNullOrEmpty(effectivePath)) return string.Empty;

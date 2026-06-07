@@ -1,12 +1,12 @@
 {
-  "name": "com.REPLACE_ORG.input-prompts",
-  "version": "1.2.0",
+  "name": "com.jorgeehdeez.input-prompts",
+  "version": "1.2.1",
   "displayName": "Input Prompts",
   "description": "Dynamic on-screen input prompt legend for the Unity New Input System. Resolves bound controls to icons and adapts to the last device used (Keyboard/Mouse, Xbox, PlayStation; generic gamepad fallback). Includes a one-click installer and auto-fill editor tools.",
   "unity": "6000.0",
-  "documentationUrl": "https://github.com/REPLACE_ORG/input-prompts",
-  "changelogUrl": "https://github.com/REPLACE_ORG/input-prompts/blob/main/CHANGELOG.md",
-  "licensesUrl": "https://github.com/REPLACE_ORG/input-prompts/blob/main/LICENSE.md",
+  "documentationUrl": "https://github.com/JorgeeHdeez/input-prompts",
+  "changelogUrl": "https://github.com/JorgeeHdeez/input-prompts/blob/main/CHANGELOG.md",
+  "licensesUrl": "https://github.com/JorgeeHdeez/input-prompts/blob/main/LICENSE.md",
   "dependencies": {
     "com.unity.inputsystem": "1.8.0",
     "com.unity.ugui": "2.0.0"
@@ -20,14 +20,14 @@
     "icons"
   ],
   "author": {
-    "name": "REPLACE_AUTHOR",
-    "url": "https://github.com/REPLACE_ORG"
+    "name": "JorgeHdez",
+    "url": "https://github.com/JorgeeHdeez"
   },
   "license": "MIT",
   "samples": [
     {
       "displayName": "Demo (Legend prefab + sprites)",
-      "description": "UI_Canvas and Row prefabs plus Kenney input sprites (CC0) to try the installer.",
+      "description": "InputPrompts_Canvas and Row prefabs plus Kenney input sprites (CC0) to try the installer.",
       "path": "Samples~/Demo"
     }
   ]

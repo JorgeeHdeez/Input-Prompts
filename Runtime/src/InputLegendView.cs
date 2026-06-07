@@ -31,7 +31,6 @@ namespace InputPrompts.Runtime
 
             _channel.OnChanged += HandleDeviceChanged;
 
-            // Resync if the channel already raised before we subscribed.
             if (_channel.Current != null)
             {
                 HandleDeviceChanged(_channel.Current);

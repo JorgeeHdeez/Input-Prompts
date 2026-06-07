@@ -89,8 +89,6 @@ namespace InputPrompts.Editor
             return result;
         }
 
-        // Exact name first; otherwise the shortest name that starts with a candidate
-        // (so "xbox_button_color_a" wins over "xbox_button_color_a_outline").
         public static Sprite FindSprite(Dictionary<string, Sprite> sprites, string[] candidates)
         {
             for (int i = 0; i < candidates.Length; i++)

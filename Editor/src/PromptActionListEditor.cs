@@ -63,7 +63,6 @@ namespace InputPrompts.Editor
             Debug.Log($"[InputPrompts] Generated {count} entries from {_inputActions.name}.");
         }
 
-        // Convenience: reuse the asset already referenced by the first entry, if any.
         private InputActionAsset InferAsset()
         {
             SerializedProperty entries = serializedObject.FindProperty("_entries");

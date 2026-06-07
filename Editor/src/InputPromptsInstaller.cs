@@ -42,7 +42,7 @@ namespace InputPrompts.Editor
             _inputActions = (InputActionAsset)EditorGUILayout.ObjectField(
                 "Input Actions", _inputActions, typeof(InputActionAsset), false);
             _legendPrefab = (GameObject)EditorGUILayout.ObjectField(
-                "Legend Prefab (UI_Canvas)", _legendPrefab, typeof(GameObject), false);
+                "Legend Prefab (InputPrompts_Canvas)", _legendPrefab, typeof(GameObject), false);
             _outputFolder = EditorGUILayout.TextField("SO Output Folder", _outputFolder);
 
             EditorGUILayout.Space(6);
@@ -89,7 +89,6 @@ namespace InputPrompts.Editor
             string folder = EnsureFolder(_outputFolder);
             string spriteFolderPath = AssetDatabase.GetAssetPath(_spriteFolder);
 
-            // 1) ScriptableObjects (reused if already present in the output folder).
             var channel = GetOrCreate<InputDeviceChangedChannel>(folder, "InputDeviceChangedChannel");
             InputIconSet keyboard = GetOrCreateIconSet(folder, "IconSet_Keyboard", DeviceFamily.KeyboardMouse);
             InputIconSet xbox = GetOrCreateIconSet(folder, "IconSet_Xbox", DeviceFamily.Xbox);
@@ -97,7 +96,6 @@ namespace InputPrompts.Editor
             var resolver = GetOrCreate<InputIconResolver>(folder, "InputIconResolver");
             var actionList = GetOrCreate<PromptActionList>(folder, "PromptActionList");
 
-            // 2) Pre-fill data via the shared helpers.
             FillIconSet(keyboard, spriteFolderPath);
             FillIconSet(xbox, spriteFolderPath);
             FillIconSet(playstation, spriteFolderPath);
@@ -107,13 +105,11 @@ namespace InputPrompts.Editor
                 _curate ? PromptActionListGenerator.DefaultExclusions : System.Array.Empty<string>());
             Debug.Log($"[InputPrompts] Generated {entries} legend entries.");
 
-            // 3) Wire the resolver.
             WireResolver(resolver, new[] { keyboard, xbox, playstation });
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            // 4) Scene (skips if a legend or tracker is already present).
             if (_addToScene)
             {
                 AddToScene(channel, resolver, actionList);
@@ -126,7 +122,6 @@ namespace InputPrompts.Editor
         private void AddToScene(
             InputDeviceChangedChannel channel, InputIconResolver resolver, PromptActionList actionList)
         {
-            // Anti-duplicate: do not add a second legend / tracker if the scene has them.
             InputLegendView existingView =
                 FindFirstObjectByType<InputLegendView>(FindObjectsInactive.Include);
             InputDeviceTracker existingTracker =
@@ -167,8 +162,6 @@ namespace InputPrompts.Editor
             EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
         }
 
-        // Manual steps the installer cannot do for you. Kept as warnings so they
-        // stay visible in the Console after install.
         private static void LogReminders(bool addedToScene)
         {
             Debug.LogWarning("[InputPrompts] TODO 1/2 - Composite: add '2DVector' -> your WASD "
@@ -192,8 +185,6 @@ namespace InputPrompts.Editor
 
         #region Tools and Utilities
 
-        // TMP needs its Essential Resources imported into the host project; a package
-        // cannot ship them. Detect their absence and tell the user how to fix it.
         private static void CheckTmpResources()
         {
             string[] found = AssetDatabase.FindAssets("t:TMP_Settings");
@@ -224,7 +215,6 @@ namespace InputPrompts.Editor
             InputIconSet set = GetOrCreate<InputIconSet>(folder, assetName);
 
             var so = new SerializedObject(set);
-            // Enum values are sequential (0..5), so the popup index maps to the value.
             so.FindProperty("_family").enumValueIndex = (int)family;
             so.ApplyModifiedProperties();
 
@@ -246,7 +236,6 @@ namespace InputPrompts.Editor
             so.ApplyModifiedProperties();
         }
 
-        // Anti-duplicate: reuse the asset at the target path if it already exists.
         private static T GetOrCreate<T>(string folder, string assetName) where T : ScriptableObject
         {
             string path = $"{folder}/{assetName}.asset";
@@ -261,7 +250,6 @@ namespace InputPrompts.Editor
             return asset;
         }
 
-        // Creates nested folders under "Assets" and returns the final project path.
         private static string EnsureFolder(string projectPath)
         {
             if (AssetDatabase.IsValidFolder(projectPath))

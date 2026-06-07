@@ -23,7 +23,6 @@ namespace InputPrompts.Runtime
 
         public event Action<InputDevice> OnChanged;
 
-        // Last device raised (null until the first raise).
         public InputDevice Current { get; private set; }
 
         public void Raise(InputDevice device)
